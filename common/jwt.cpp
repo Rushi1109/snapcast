@@ -266,7 +266,7 @@ bool Jwt::parse(const std::string& token, const std::string& pem_cert)
         auto binary = base64url_decode(signature);
         std::string msg = parts[0] + "." + parts[1];
         bool auth;
-        if (!verifySignature(pem_cert, reinterpret_cast<unsigned char*>(binary.data()), binary.size(), msg.c_str(), msg.size(), auth))
+        if (!verifySignature(pem_cert, reinterpret_cast<const unsigned char*>(binary.data()), binary.size(), msg.c_str(), msg.size(), auth))
         {
             LOG(ERROR, LOG_TAG) << "Failed to verify signature\n";
             return false;
