@@ -200,7 +200,7 @@ Jwt::Jwt() : claims({})
 std::experimental::optional<std::chrono::system_clock::time_point> Jwt::getIat() const
 {
     if (!claims.contains("iat"))
-        return std::nullopt;
+        return std::experimental::nullopt;
     return std::chrono::system_clock::from_time_t(claims.at("iat").get<int64_t>());
 }
 
@@ -215,7 +215,7 @@ void Jwt::setIat(const std::experimental::optional<std::chrono::system_clock::ti
 std::experimental::optional<std::chrono::system_clock::time_point> Jwt::getExp() const
 {
     if (!claims.contains("exp"))
-        return std::nullopt;
+        return std::experimental::nullopt;
     return std::chrono::system_clock::from_time_t(claims.at("exp").get<int64_t>());
 }
 
@@ -230,7 +230,7 @@ void Jwt::setExp(const std::experimental::optional<std::chrono::system_clock::ti
 std::experimental::optional<std::string> Jwt::getSub() const
 {
     if (!claims.contains("sub"))
-        return std::nullopt;
+        return std::experimental::nullopt;
     return claims.at("sub").get<std::string>();
 }
 
@@ -296,7 +296,7 @@ std::experimental::optional<std::string> Jwt::getToken(const std::string& pem_ke
     else
     {
         LOG(ERROR, LOG_TAG) << "PEM key must be an RSA key\n";
-        return std::nullopt;
+        return std::experimental::nullopt;
     }
 
     LOG(DEBUG, LOG_TAG) << "Header: " << header << ", payload: " << claims << "\n";
@@ -314,5 +314,5 @@ std::experimental::optional<std::string> Jwt::getToken(const std::string& pem_ke
     }
 
     LOG(ERROR, LOG_TAG) << "Failed to sign token\n";
-    return std::nullopt;
+    return std::experimental::nullopt;
 }

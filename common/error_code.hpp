@@ -32,13 +32,13 @@ namespace snapcast
 struct ErrorCode : public std::error_code
 {
     /// c'tor
-    ErrorCode() : std::error_code(), detail_(std::nullopt)
+    ErrorCode() : std::error_code(), detail_(std::experimental::nullopt)
     {
     }
 
     /// c'tor
     /// @param code the std error code
-    ErrorCode(const std::error_code& code) : std::error_code(code), detail_(std::nullopt)
+    ErrorCode(const std::error_code& code) : std::error_code(code), detail_(std::experimental::nullopt)
     {
     }
 
