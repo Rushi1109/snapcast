@@ -28,7 +28,7 @@
 #include <atomic>
 #include <cstdio>
 #include <memory>
-#include <optional>
+#include <experimental/optional>
 
 
 namespace player
@@ -82,7 +82,7 @@ protected:
     pa_context* pa_ctx_;
     pa_stream* playstream_;
     pa_proplist* proplist_;
-    std::optional<std::string> server_;
+    std::experimental::optional<std::string> server_;
     std::map<std::string, std::string> properties_;
 
     // cache of the last volume change

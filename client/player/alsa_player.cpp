@@ -85,8 +85,8 @@ AlsaPlayer::AlsaPlayer(boost::asio::io_context& io_context, const ClientSettings
     if (params.find("fragments") != params.end())
         periods_ = std::max(cpt::stoi(params["fragments"]), 2);
 
-    LOG(INFO, LOG_TAG) << "Using " << (buffer_time_.has_value() ? "configured" : "default")
-                       << " buffer_time: " << buffer_time_.value_or(BUFFER_TIME).count() / 1000 << " ms, " << (periods_.has_value() ? "configured" : "default")
+    LOG(INFO, LOG_TAG) << "Using " << (buffer_time_ ? "configured" : "default")
+                       << " buffer_time: " << buffer_time_.value_or(BUFFER_TIME).count() / 1000 << " ms, " << (periods_ ? "configured" : "default")
                        << " fragments: " << periods_.value_or(PERIODS) << "\n";
 }
 

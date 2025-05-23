@@ -40,7 +40,7 @@
 #include <ctime>
 #include <exception>
 #include <memory>
-#include <optional>
+#include <experimental/optional>
 #include <sys/types.h>
 #include <vector>
 
@@ -197,46 +197,46 @@ Jwt::Jwt() : claims({})
 {
 }
 
-std::optional<std::chrono::system_clock::time_point> Jwt::getIat() const
+std::experimental::optional<std::chrono::system_clock::time_point> Jwt::getIat() const
 {
     if (!claims.contains("iat"))
         return std::nullopt;
     return std::chrono::system_clock::from_time_t(claims.at("iat").get<int64_t>());
 }
 
-void Jwt::setIat(const std::optional<std::chrono::system_clock::time_point>& iat)
+void Jwt::setIat(const std::experimental::optional<std::chrono::system_clock::time_point>& iat)
 {
-    if (iat.has_value())
+    if (iat)
         claims["iat"] = std::chrono::system_clock::to_time_t(iat.value());
     else if (claims.contains("iat"))
         claims.erase("iat");
 }
 
-std::optional<std::chrono::system_clock::time_point> Jwt::getExp() const
+std::experimental::optional<std::chrono::system_clock::time_point> Jwt::getExp() const
 {
     if (!claims.contains("exp"))
         return std::nullopt;
     return std::chrono::system_clock::from_time_t(claims.at("exp").get<int64_t>());
 }
 
-void Jwt::setExp(const std::optional<std::chrono::system_clock::time_point>& exp)
+void Jwt::setExp(const std::experimental::optional<std::chrono::system_clock::time_point>& exp)
 {
-    if (exp.has_value())
+    if (exp)
         claims["exp"] = std::chrono::system_clock::to_time_t(exp.value());
     else if (claims.contains("exp"))
         claims.erase("exp");
 }
 
-std::optional<std::string> Jwt::getSub() const
+std::experimental::optional<std::string> Jwt::getSub() const
 {
     if (!claims.contains("sub"))
         return std::nullopt;
     return claims.at("sub").get<std::string>();
 }
 
-void Jwt::setSub(const std::optional<std::string>& sub)
+void Jwt::setSub(const std::experimental::optional<std::string>& sub)
 {
-    if (sub.has_value())
+    if (sub)
         claims["sub"] = sub.value();
     else if (claims.contains("sub"))
         claims.erase("sub");
@@ -286,7 +286,7 @@ bool Jwt::parse(const std::string& token, const std::string& pem_cert)
 }
 
 
-std::optional<std::string> Jwt::getToken(const std::string& pem_key) const
+std::experimental::optional<std::string> Jwt::getToken(const std::string& pem_key) const
 {
     json header = {{"typ", "JWT"}};
     if (pem_key.find("-----BEGIN PRIVATE KEY-----") == 0)

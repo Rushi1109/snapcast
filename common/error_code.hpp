@@ -19,7 +19,7 @@
 #pragma once
 
 // standard headers
-#include <optional>
+#include <experimental/optional>
 #include <string>
 #include <system_error>
 #include <variant>
@@ -57,14 +57,14 @@ struct ErrorCode : public std::error_code
     /// @return detaiöed error message
     std::string detailed_message() const
     {
-        if (detail_.has_value())
+        if (detail_)
             return message() + ": " + *detail_;
         return message();
     }
 
 private:
     /// Optional error detais
-    std::optional<std::string> detail_;
+    std::experimental::optional<std::string> detail_;
 };
 
 

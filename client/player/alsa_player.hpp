@@ -28,7 +28,7 @@
 
 // standard headers
 #include <chrono>
-#include <optional>
+#include <experimental/optional>
 #include <vector>
 
 
@@ -89,8 +89,8 @@ private:
     std::recursive_mutex rec_mutex_;
     boost::asio::steady_timer timer_;
 
-    std::optional<std::chrono::microseconds> buffer_time_;
-    std::optional<uint32_t> periods_;
+    std::experimental::optional<std::chrono::microseconds> buffer_time_;
+    std::experimental::optional<uint32_t> periods_;
 };
 
 } // namespace player

@@ -414,7 +414,7 @@ void PulsePlayer::connect()
 
     pa_ctx_ = pa_context_new_with_proplist(pa_mlapi, "Snapcast", proplist_);
 
-    const char* server = server_.has_value() ? server_.value().c_str() : nullptr;
+    const char* server = server_ ? server_.value().c_str() : nullptr;
     if (pa_context_connect(pa_ctx_, server, PA_CONTEXT_NOFLAGS, nullptr) < 0)
         throw SnapException("Failed to connect to PulseAudio context, error: " + std::string(pa_strerror(pa_context_errno(pa_ctx_))));
 

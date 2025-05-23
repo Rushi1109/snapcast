@@ -34,7 +34,7 @@
 #include <cmath>
 #include <iostream>
 #include <memory>
-#include <optional>
+#include <experimental/optional>
 
 
 using namespace std;
@@ -229,7 +229,7 @@ void Player::setVolume(const Volume& volume)
     else if (settings_.mixer.mode == ClientSettings::Mixer::Mode::script)
     {
 #ifdef SUPPORTS_VOLUME_SCRIPT
-        static std::optional<Volume> pending_volume_change;
+        static std::experimental::optional<Volume> pending_volume_change;
         static boost::process::child mixer_script_process;
         if (mixer_script_process.running())
         {
@@ -248,10 +248,10 @@ void Player::setVolume(const Volume& volume)
                 {
                     std::unique_lock<std::mutex> lock(mutex_);
                     LOG(DEBUG, LOG_TAG) << "Error code: " << ec.message() << ", i: " << ret_val << "\n";
-                    if (pending_volume_change.has_value())
+                    if (pending_volume_change)
                     {
                         Volume v = pending_volume_change.value();
-                        pending_volume_change = std::nullopt;
+                        pending_volume_change = std::experimental::nullopt;
                         lock.unlock();
                         setVolume(v);
                     }
@@ -261,7 +261,7 @@ void Player::setVolume(const Volume& volume)
             catch (const std::exception& e)
             {
                 LOG(ERROR, LOG_TAG) << "Failed to run script '" + settings_.mixer.parameter + "', error: " << e.what() << "\n";
-                pending_volume_change = std::nullopt;
+                pending_volume_change = std::experimental::nullopt;
             }
         }
 #else

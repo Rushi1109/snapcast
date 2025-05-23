@@ -23,7 +23,7 @@
 
 // standard headers
 #include <chrono>
-#include <optional>
+#include <experimental/optional>
 #include <string>
 
 
@@ -92,25 +92,25 @@ public:
     /// Create an base64 url encoded token of the form "<header>.<payload>.<signature>"
     /// @param pem_key Private key in PEM format to sign the token
     /// @return the token or nullopt if failed
-    std::optional<std::string> getToken(const std::string& pem_key) const;
+    std::experimental::optional<std::string> getToken(const std::string& pem_key) const;
 
     /// Get the iat "Issued at time" claim
     /// @return the claim or nullopt, if not present
-    std::optional<std::chrono::system_clock::time_point> getIat() const;
+    std::experimental::optional<std::chrono::system_clock::time_point> getIat() const;
     /// Set the iat "Issued at time" claim, use nullopt to delete the iat
-    void setIat(const std::optional<std::chrono::system_clock::time_point>& iat);
+    void setIat(const std::experimental::optional<std::chrono::system_clock::time_point>& iat);
 
     /// Get the exp "Expiration time" claim
     /// @return the claim or nullopt, if not present
-    std::optional<std::chrono::system_clock::time_point> getExp() const;
+    std::experimental::optional<std::chrono::system_clock::time_point> getExp() const;
     /// Set the exp "Expiration time" claim, use nullopt to delete the exp
-    void setExp(const std::optional<std::chrono::system_clock::time_point>& exp);
+    void setExp(const std::experimental::optional<std::chrono::system_clock::time_point>& exp);
 
     /// Get the sub "Subject" claim
     /// @return the claim or nullopt, if not present
-    std::optional<std::string> getSub() const;
+    std::experimental::optional<std::string> getSub() const;
     /// Set the sub "Subject" claim, use nullopt to delete the sub
-    void setSub(const std::optional<std::string>& sub);
+    void setSub(const std::experimental::optional<std::string>& sub);
 
     /// The token's raw payload (claims) in json format
     json claims;

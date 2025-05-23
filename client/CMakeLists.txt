@@ -121,7 +121,8 @@ if(ANDROID)
   target_link_libraries(libsnapclient.so ${CLIENT_LIBRARIES} log OpenSLES)
 else()
   add_executable(snapclient ${CLIENT_SOURCES})
-  target_link_libraries(snapclient ${CLIENT_LIBRARIES})
+  set(EXTRA_LIBS stdc++fs)
+  target_link_libraries(snapclient ${CLIENT_LIBRARIES} ${EXTRA_LIBS})
 
   install(
     TARGETS snapclient
