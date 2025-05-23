@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.4.3)
 
 # find_package() uses uppercase <PackageName>_ROOT variables.
 if(POLICY CMP0144)
@@ -25,7 +25,7 @@ option(UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(TIDY "Enable clang tidy" OFF)
 
 if(REVISION)
-  add_compile_definitions(REVISION=\"${REVISION}\")
+  add_definitions(-DREVISION=\"${REVISION}\")
 endif()
 
 if(TIDY)
@@ -138,7 +138,7 @@ endif()
 set(INCLUDE_DIRS "${CMAKE_SOURCE_DIR}" "${CMAKE_INSTALL_INCLUDEDIR}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-add_compile_definitions(VERSION="${PROJECT_VERSION}")
+add_definitions(-DVERSION="${PROJECT_VERSION}")
 
 if(NOT ANDROID)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -147,7 +147,7 @@ if(NOT ANDROID)
 endif()
 
 # Configure compiler options
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 include(${CMAKE_SOURCE_DIR}/cmake/TargetArch.cmake)
 target_architecture(HOST_ARCH)
@@ -166,7 +166,7 @@ include(CheckAtomic)
 include(TestBigEndian)
 test_big_endian(BIGENDIAN)
 if(${BIGENDIAN})
-  add_compile_definitions(IS_BIG_ENDIAN)
+  add_definitions(-DIS_BIG_ENDIAN)
 endif(${BIGENDIAN})
 
 # Check dependencies
@@ -187,7 +187,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/CheckCXX11StringSupport.cmake)
 
 check_cxx11_string_support(HAS_CXX11_STRING_SUPPORT)
 if(NOT HAS_CXX11_STRING_SUPPORT)
-  add_compile_definitions(NO_CPP11_STRING)
+  add_definitions(-DNO_CPP11_STRING)
 endif()
 
 if(NOT WIN32 AND NOT ANDROID)
@@ -195,46 +195,46 @@ if(NOT WIN32 AND NOT ANDROID)
   if(MACOSX)
     set(BONJOUR_FOUND true)
     if(BONJOUR_FOUND)
-      add_compile_definitions(HAS_BONJOUR)
+      add_definitions(-DHAS_BONJOUR)
     endif(BONJOUR_FOUND)
 
-    add_compile_definitions(FREEBSD MACOS HAS_DAEMON)
+    add_definitions(-DFREEBSD -DMACOS -DHAS_DAEMON)
     link_directories("/usr/local/lib")
     list(APPEND INCLUDE_DIRS "/usr/local/include")
   else()
 
     pkg_search_module(ALSA REQUIRED alsa)
     if(ALSA_FOUND)
-      add_compile_definitions(HAS_ALSA)
+      add_definitions(-DHAS_ALSA)
     endif(ALSA_FOUND)
 
     if(BUILD_WITH_JACK)
       pkg_search_module(JACK jack)
       if(JACK_FOUND)
-        add_compile_definitions(HAS_JACK)
+        add_definitions(-DHAS_JACK)
       endif(JACK_FOUND)
     endif(BUILD_WITH_JACK)
 
     if(BUILD_WITH_PULSE)
       pkg_search_module(PULSE libpulse)
       if(PULSE_FOUND)
-        add_compile_definitions(HAS_PULSE)
+        add_definitions(-DHAS_PULSE)
       endif(PULSE_FOUND)
     endif(BUILD_WITH_PULSE)
 
     if(BUILD_WITH_AVAHI)
       pkg_search_module(AVAHI avahi-client)
       if(AVAHI_FOUND)
-        add_compile_definitions(HAS_AVAHI)
+        add_definitions(-DHAS_AVAHI)
       else()
         message(STATUS "avahi-client not found")
       endif(AVAHI_FOUND)
     endif(BUILD_WITH_AVAHI)
 
-    add_compile_definitions(HAS_DAEMON)
+    add_definitions(-DHAS_DAEMON)
 
     if(FREEBSD)
-      add_compile_definitions(FREEBSD)
+      add_definitions(-DFREEBSD)
       link_directories("/usr/local/lib")
       list(APPEND INCLUDE_DIRS "/usr/local/include")
     endif()
@@ -242,7 +242,7 @@ if(NOT WIN32 AND NOT ANDROID)
 
   pkg_search_module(SOXR soxr)
   if(SOXR_FOUND)
-    add_compile_definitions(HAS_SOXR)
+    add_definitions(-DHAS_SOXR)
   else()
     message(STATUS "soxr not found")
   endif(SOXR_FOUND)
@@ -250,7 +250,7 @@ if(NOT WIN32 AND NOT ANDROID)
   if(BUILD_WITH_FLAC)
     pkg_search_module(FLAC flac)
     if(FLAC_FOUND)
-      add_compile_definitions(HAS_FLAC)
+      add_definitions(-DHAS_FLAC)
     else()
       message(STATUS "flac not found")
     endif(FLAC_FOUND)
@@ -259,7 +259,7 @@ if(NOT WIN32 AND NOT ANDROID)
   if(BUILD_WITH_VORBIS OR BUILD_WITH_TREMOR)
     pkg_search_module(OGG ogg)
     if(OGG_FOUND)
-      add_compile_definitions(HAS_OGG)
+      add_definitions(-DHAS_OGG)
     else()
       message(STATUS "ogg not found")
     endif(OGG_FOUND)
@@ -268,14 +268,14 @@ if(NOT WIN32 AND NOT ANDROID)
   if(BUILD_WITH_VORBIS)
     pkg_search_module(VORBIS vorbis)
     if(VORBIS_FOUND)
-      add_compile_definitions(HAS_VORBIS)
+      add_definitions(-DHAS_VORBIS)
     endif(VORBIS_FOUND)
   endif()
 
   if(BUILD_WITH_TREMOR)
     pkg_search_module(TREMOR vorbisidec)
     if(TREMOR_FOUND)
-      add_compile_definitions(HAS_TREMOR)
+      add_definitions(-DHAS_TREMOR)
     endif(TREMOR_FOUND)
   endif()
 
@@ -288,7 +288,7 @@ if(NOT WIN32 AND NOT ANDROID)
   if(BUILD_WITH_VORBIS)
     pkg_search_module(VORBISENC vorbisenc)
     if(VORBISENC_FOUND)
-      add_compile_definitions(HAS_VORBIS_ENC)
+      add_definitions(-DHAS_VORBIS_ENC)
     else()
       message(STATUS "vorbisenc not found")
     endif(VORBISENC_FOUND)
@@ -297,7 +297,7 @@ if(NOT WIN32 AND NOT ANDROID)
   if(BUILD_WITH_OPUS)
     pkg_search_module(OPUS opus)
     if(OPUS_FOUND)
-      add_compile_definitions(HAS_OPUS)
+      add_definitions(-DHAS_OPUS)
     else()
       message(STATUS "opus not found")
     endif(OPUS_FOUND)
@@ -306,7 +306,7 @@ if(NOT WIN32 AND NOT ANDROID)
   if(BUILD_WITH_EXPAT)
     pkg_search_module(EXPAT expat)
     if(EXPAT_FOUND)
-      add_compile_definitions(HAS_EXPAT)
+      add_definitions(-DHAS_EXPAT)
     else()
       message(STATUS "expat not found")
     endif(EXPAT_FOUND)
@@ -324,16 +324,16 @@ else()
   find_package(tremor REQUIRED CONFIG)
   find_package(boost REQUIRED CONFIG)
 
-  add_compile_definitions(HAS_OBOE)
-  add_compile_definitions(HAS_OPENSL)
-  add_compile_definitions(HAS_FLAC)
-  add_compile_definitions(HAS_OGG)
-  add_compile_definitions(HAS_OPUS)
-  add_compile_definitions(HAS_SOXR)
-  add_compile_definitions(HAS_TREMOR)
+  add_definitions(-DHAS_OBOE)
+  add_definitions(-DHAS_OPENSL)
+  add_definitions(-DHAS_FLAC)
+  add_definitions(-DHAS_OGG)
+  add_definitions(-DHAS_OPUS)
+  add_definitions(-DHAS_SOXR)
+  add_definitions(-DHAS_TREMOR)
 endif()
 
-add_compile_definitions(BOOST_ERROR_CODE_HEADER_ONLY BOOST_ASIO_NO_TS_EXECUTORS)
+add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY -DBOOST_ASIO_NO_TS_EXECUTORS)
 
 if(WIN32)
   include(FindPackageHandleStandardArgs)
@@ -363,23 +363,23 @@ if(WIN32)
   find_package_handle_standard_args(Soxr REQUIRED SOXR_INCLUDE_DIRS
                                     SOXR_LIBRARIES)
 
-  add_compile_definitions(
-    NTDDI_VERSION=0x06020000
-    _WIN32_WINNT=0x0602
-    WINVER=0x0602
-    WINDOWS
-    WIN32_LEAN_AND_MEAN
-    UNICODE
+  add_definitions(
+    -DNTDDI_VERSION=0x06020000
+    -D_WIN32_WINNT=0x0602
+    -DWINVER=0x0602
+    -DWINDOWS
+    -DWIN32_LEAN_AND_MEAN
+    -DUNICODE
     # _UNICODE
-    _CRT_SECURE_NO_WARNINGS)
-  add_compile_definitions(
-    HAS_OGG
-    HAS_VORBIS
-    HAS_FLAC
-    HAS_VORBIS_ENC
-    HAS_OPUS
-    HAS_WASAPI
-    HAS_SOXR)
+    -D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(
+    -DHAS_OGG
+    -DHAS_VORBIS
+    -DHAS_FLAC
+    -DHAS_VORBIS_ENC
+    -DHAS_OPUS
+    -DHAS_WASAPI
+    -DHAS_SOXR)
 endif()
 
 list(APPEND CMAKE_REQUIRED_INCLUDES "${INCLUDE_DIRS}")

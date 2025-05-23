@@ -22,7 +22,7 @@ if(MACOSX)
   endif(BONJOUR_FOUND)
 
   # CoreAudio
-  add_compile_definitions(HAS_COREAUDIO)
+  add_definitions(-DHAS_COREAUDIO)
   list(APPEND CLIENT_SOURCES player/coreaudio_player.cpp)
   find_library(COREAUDIO_LIB CoreAudio)
   find_library(COREFOUNDATION_LIB CoreFoundation)
