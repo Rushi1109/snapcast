@@ -6,6 +6,7 @@ set(SERVER_SOURCES
     control_session_tcp.cpp
     control_session_http.cpp
     control_session_ws.cpp
+    port_manager.cpp
     snapserver.cpp
     server.cpp
     stream_server.cpp

@@ -22,7 +22,9 @@
 // local headers
 #include "common/aixlog.hpp"
 #include "common/message/server_settings.hpp"
+#include "common/snap_exception.hpp"
 #include "jsonrpcpp.hpp"
+#include "port_manager.hpp"
 #include "server.hpp"
 
 // 3rd party headers
@@ -102,6 +104,7 @@ ControlRequestFactory::ControlRequestFactory(const Server& server)
     add_request(std::make_shared<StreamControlRequest>(server));
     add_request(std::make_shared<StreamSetPropertyRequest>(server));
     add_request(std::make_shared<StreamAddRequest>(server));
+    add_request(std::make_shared<StreamAddTCPRequest>(server));
     add_request(std::make_shared<StreamRemoveRequest>(server));
 
     // Server requests
@@ -738,6 +741,75 @@ void StreamAddRequest::execute(const jsonrpcpp::request_ptr& request, AuthInfo& 
     on_response(std::move(response), nullptr);
 }
 
+StreamAddTCPRequest::StreamAddTCPRequest(const Server& server) : StreamRequest(server, "Stream.AddTCPStream")
+{
+}
+
+void StreamAddTCPRequest::execute(const jsonrpcpp::request_ptr& request, AuthInfo& authinfo, const OnResponse& on_response)
+{
+    // clang-format off
+    // Request:      {"id":4,"jsonrpc":"2.0","method":"Stream.AddTCPStream","params":{"streamId":"name"}}
+    // Response:     {"id":4,"jsonrpc":"2.0","result":{"id":"name", "port":8000}}
+    // clang-format on
+
+    checkParams(request, {"streamId"});
+    std::uint16_t port = PortManager::GetInstance().AllocatePort();
+    std::string streamId = request->params().get("streamId");
+
+    std::string stream_uri = std::string{"tcp://0.0.0.0:"} + std::to_string(port) + "?name=" + streamId;
+    StreamUri parsed_uri(stream_uri);
+
+    std::filesystem::path script = parsed_uri.getQuery("controlscript");
+    if (!script.empty())
+    {
+        // script must be located in the [stream] plugin_dir
+        std::filesystem::path plugin_dir = getSettings().stream.plugin_dir;
+        // if script file name is relative, prepend the plugin_dir
+        if (!script.is_absolute())
+            script = plugin_dir / script;
+        // convert to normalized absolute path
+        script = std::filesystem::weakly_canonical(script);
+        LOG(DEBUG, LOG_TAG) << "controlscript: " << script.native() << "\n";
+        // check if script is directly located in plugin_dir
+        if (script.parent_path() != plugin_dir) {
+            PortManager::GetInstance().FreePort(port);
+            throw jsonrpcpp::InvalidParamsException("controlscript must be located in '" + plugin_dir.native() + "'");
+        }
+        if (!std::filesystem::exists(script)) {
+            PortManager::GetInstance().FreePort(port);
+            throw jsonrpcpp::InvalidParamsException("controlscript '" + script.native() + "' does not exist");
+        }
+        parsed_uri.query["controlscript"] = script;
+        LOG(DEBUG, LOG_TAG) << "Raw stream uri: " << stream_uri << "\n";
+        stream_uri = parsed_uri.toString();
+    }
+
+    std::ignore = authinfo;
+    LOG(INFO, LOG_TAG) << "Stream.AddTCPStream(" << stream_uri << ")\n";
+
+    // Add stream
+    try {
+        PcmStreamPtr stream = getStreamManager().addStream(stream_uri);
+        if (stream == nullptr) {
+            PortManager::GetInstance().FreePort(port);
+            throw jsonrpcpp::InternalErrorException("Stream not created", request->id());
+        }
+        stream->start(); // We start the stream, otherwise it would be silent
+
+        // Setup response
+        Json result;
+        result["id"] = stream->getId();
+        result["port"] = port;
+
+        auto response = std::make_shared<jsonrpcpp::Response>(*request, result);
+        on_response(std::move(response), nullptr);
+    }
+    catch (const SnapException& e)
+    {
+        PortManager::GetInstance().FreePort(port);
+        throw e;
+    }
+}
 
 StreamRemoveRequest::StreamRemoveRequest(const Server& server) : StreamRequest(server, "Stream.RemoveStream")
 {

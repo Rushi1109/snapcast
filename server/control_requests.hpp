@@ -260,6 +260,14 @@ public:
     void execute(const jsonrpcpp::request_ptr& request, AuthInfo& authinfo, const OnResponse& on_response) override;
 };
 
+/// "Stream.AddTCPStream" request
+class StreamAddTCPRequest : public StreamRequest
+{
+public:
+    /// c'tor
+    explicit StreamAddTCPRequest(const Server& server);
+    void execute(const jsonrpcpp::request_ptr& request, AuthInfo& authinfo, const OnResponse& on_response) override;
+};
 
 /// "Stream.RemoveStream" request
 class StreamRemoveRequest : public StreamRequest

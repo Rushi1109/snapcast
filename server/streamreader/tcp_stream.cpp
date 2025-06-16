@@ -24,6 +24,7 @@
 #include "common/snap_exception.hpp"
 #include "common/str_compat.hpp"
 #include "common/utils/string_utils.hpp"
+#include "port_manager.hpp"
 
 // 3rd party headers
 
@@ -111,8 +112,11 @@ void TcpStream::connect()
 void TcpStream::disconnect()
 {
     reconnect_timer_.cancel();
-    if (acceptor_)
+    if (acceptor_) {
         acceptor_->cancel();
+        acceptor_.reset();
+        PortManager::GetInstance().FreePort(port_);
+    }  
     AsioStream<tcp::socket>::disconnect();
 }
 
